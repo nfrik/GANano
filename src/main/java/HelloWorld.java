@@ -6,6 +6,7 @@ import org.jenetics.BitGene;
 import org.jenetics.Genotype;
 import org.jenetics.engine.Engine;
 import org.jenetics.engine.EvolutionResult;
+import org.jenetics.engine.EvolutionStatistics;
 import org.jenetics.util.Factory;
 
 public class HelloWorld {
@@ -19,6 +20,9 @@ public class HelloWorld {
         //     for the problem.
         Factory<Genotype<BitGene>> gtf =
                 Genotype.of(BitChromosome.of(10, 0.5));
+
+        final EvolutionStatistics<Integer, ?>
+                statistics = EvolutionStatistics.ofNumber();
 
         // 3.) Create the execution environment.
         Engine<BitGene, Integer> engine = Engine

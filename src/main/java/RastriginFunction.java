@@ -1,8 +1,13 @@
 import org.jenetics.*;
 import org.jenetics.engine.Engine;
+import org.jenetics.engine.EvolutionResult;
 import org.jenetics.engine.EvolutionStatistics;
 import org.jenetics.engine.codecs;
 import org.jenetics.util.DoubleRange;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static org.jenetics.engine.EvolutionResult.toBestPhenotype;
 import static org.jenetics.engine.limit.bySteadyFitness;
 
@@ -11,8 +16,8 @@ import static org.jenetics.engine.limit.bySteadyFitness;
  */
 public class RastriginFunction {
     private static final double A = 10;
-    private static final double S = 100;
-    private static final double R = 50.12;
+    private static final double S = 200;
+    private static final double R = 82.12;
     private static final int N = 2;
 
     private static double fitness(final double[] x) {
@@ -37,23 +42,36 @@ public class RastriginFunction {
         final Engine<DoubleGene, Double> engine = Engine.builder(
                 RastriginFunction::fitness2,
                 codecs.ofVector(DoubleRange.of(-R, R), N))
-                .populationSize(100)
+                .populationSize(1000)
                 .optimize(Optimize.MAXIMUM)
                 .alterers(
-                        new Mutator<>(0.03),
+                        new Mutator<>(0.13),
                         new MeanAlterer<>(0.6))
                 .build();
 
         final EvolutionStatistics<Double, ?>
                 statistics = EvolutionStatistics.ofNumber();
 
-        final Phenotype<DoubleGene, Double> best = engine.stream()
-                .limit(bySteadyFitness(7))
-                .peek(statistics)
-                .collect(toBestPhenotype());
+//        final Phenotype<DoubleGene, Double> best = engine.stream()
+//                .limit(bySteadyFitness(7))
+//                .peek(statistics)
+//                .collect(toBestPhenotype());
+
+          final List<EvolutionResult<DoubleGene, Double>> best = engine.stream()
+                    .limit(bySteadyFitness(20))
+//                    .peek(statistics)
+                    .peek(x -> PltXYScatter.getInstance().plotXY(x.getBestPhenotype().getGenotype().getChromosome().getGene(0).doubleValue(),x.getBestPhenotype().getGenotype().getChromosome().getGene(1).doubleValue()))
+                    .peek(x -> PltSeries.getInstance().plotYt(x.getBestPhenotype().getFitness()))
+                    .collect(Collectors.toList());
+
 
         System.out.println(statistics);
-        System.out.println(best);
+
+        for(EvolutionResult er : best){
+            er.getBestFitness();
+        }
+
+//        System.out.println(best);
 
     }
 }
